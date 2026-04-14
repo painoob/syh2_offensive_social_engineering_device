@@ -83,6 +83,38 @@ O OSEP-32 é construído sobre a **ESP32-2432S028R** ("Cheap Yellow Display" / C
 | **Cabo USB-C** | Para gravação do firmware e alimentação | 1 |
 | **Case de acrílico** | Proteção e acabamento (opcional) | 1 |
 
+## 🖼️ Slides de Exemplo
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="slides/01_atm_phishing.jpg" width="280"/><br/>
+      <sub>🏧 ATM / Terminal de Pagamento</sub>
+    </td>
+    <td align="center">
+      <img src="slides/02_kiosk_qrcode.jpg" width="280"/><br/>
+      <sub>🏢 Kiosk Corporativo com QR Code</sub>
+    </td>
+    <td align="center">
+      <img src="slides/03_lobby_credential.jpg" width="280"/><br/>
+      <sub>📋 Portal de Lobby / Captura de Credenciais</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="slides/04_blueteam_awareness.jpg" width="280"/><br/>
+      <sub>🎓 Blue Team Awareness</sub>
+    </td>
+    <td align="center">
+      <img src="slides/05_physical_access.jpg" width="280"/><br/>
+      <sub>🔍 Controle de Acesso Físico</sub>
+    </td>
+    <td align="center">
+      <i>Adicione seus próprios slides<br/>via FTP → /slides</i>
+    </td>
+  </tr>
+</table>
+
 > ✅ **Vantagem:** por ser uma placa all-in-one, basta inserir o cartão microSD, conectar o USB-C e gravar o firmware. Sem jumpers, sem protoboard, sem soldas.
 
 ---
