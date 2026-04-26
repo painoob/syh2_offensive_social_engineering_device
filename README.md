@@ -5,10 +5,11 @@
 
 ![ESP32](https://img.shields.io/badge/ESP32-2432S028R-red?style=for-the-badge&logo=espressif)
 ![Arduino](https://img.shields.io/badge/Arduino_IDE-1.8.x-blue?style=for-the-badge&logo=arduino)
+![Version](https://img.shields.io/badge/Versão-2.0.0-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![SYH2](https://img.shields.io/badge/Certificação-SYH2_Solyd-black?style=for-the-badge)
 
-**Plataforma de engenharia social ofensiva baseada em ESP32 com display TFT 320×240, controle remoto via Wi-Fi, servidor FTP integrado e painel web de administração.**
+**Plataforma de engenharia social ofensiva baseada em ESP32 com display TFT 320×240, slideshow de campanhas visuais, evil portal com captura de credenciais, controle remoto via Wi-Fi e servidor FTP integrado.**
 
 </div>
 
@@ -26,6 +27,7 @@
 - [Arquitetura do Firmware](#-arquitetura-do-firmware)
 - [API REST](#-api-rest)
 - [Guia de Operação](#-guia-de-operação)
+- [Evil Portal](#-evil-portal)
 - [Script osep_sender.py](#-script-osep_senderpy)
 - [Credenciais Padrão](#-credenciais-padrão)
 - [Aviso Legal](#-aviso-legal)
@@ -36,47 +38,25 @@
 
 O **OSEP-32** é uma ferramenta de engenharia social ofensiva desenvolvida para profissionais de segurança e pentesters que atuam em exercícios de **Red Team** e avaliações de segurança física.
 
-O dispositivo exibe sequências de imagens JPEG (campanhas de phishing visuais) em um display TFT compacto, sendo controlado remotamente via Wi-Fi através de um painel web protegido por senha. Opera de forma **totalmente autônoma**, sem dependência de rede externa, criando seu próprio ponto de acesso Wi-Fi.
+O dispositivo exibe sequências de imagens JPEG (campanhas de phishing visuais) em um display TFT compacto, sendo controlado remotamente via Wi-Fi. Na versão 2.0, incorpora um **evil portal com captive portal e captura de credenciais** que opera em paralelo ao slideshow — o display continua exibindo as imagens normalmente enquanto qualquer dispositivo conectado ao AP é redirecionado para a página de phishing, mantendo a **furtividade total** do dispositivo em campo.
+
+Opera de forma **totalmente autônoma**, sem dependência de rede externa, criando seu próprio ponto de acesso Wi-Fi com DNS spoof integrado.
 
 ### Casos de Uso
 
 - 🏧 Simulação de terminais de pagamento / ATMs com telas de phishing
 - 🏢 Kiosks falsos em eventos corporativos exibindo QR codes maliciosos
-- 📋 Displays informativos em lobbies capturando credenciais
+- 📋 Displays informativos em lobbies capturando credenciais via evil portal
 - 🎓 Treinamentos de conscientização interna (Blue Team awareness)
-- 🔍 Avaliações de segurança física com vetor visual
+- 🔍 Avaliações de segurança física com vetor visual + coleta de credenciais
 
-## 🖼️ Slides de Exemplo
+---
 
-<table>
-  <tr>
-    <td align="center">
-      <img src="slides/01_atm_phishing.jpg" width="280"/><br/>
-      <sub>🏧 ATM / Terminal de Pagamento</sub>
-    </td>
-    <td align="center">
-      <img src="slides/02_kiosk_qrcode.jpg" width="280"/><br/>
-      <sub>🏢 Kiosk Corporativo com QR Code</sub>
-    </td>
-    <td align="center">
-      <img src="slides/03_lobby_credential.jpg" width="280"/><br/>
-      <sub>📋 Portal de Lobby / Captura de Credenciais</sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="center">
-      <img src="slides/04_blueteam_awareness.jpg" width="280"/><br/>
-      <sub>🎓 Blue Team Awareness</sub>
-    </td>
-    <td align="center">
-      <img src="slides/05_physical_access.jpg" width="280"/><br/>
-      <sub>🔍 Controle de Acesso Físico</sub>
-    </td>
-    <td align="center">
-      <i>Adicione seus próprios slides<br/>via FTP → /slides</i>
-    </td>
-  </tr>
-</table>
+## 📹 Demonstração
+
+<img width="640" height="480" alt="poc_osep32+(2)+(1) (1)" src="https://github.com/user-attachments/assets/86b546fc-dc11-424d-a90b-2fd84e3152f6" />
+
+Link completo de demonstração: [https://youtu.be/jyH-7tuEc1Q](https://youtu.be/jyH-7tuEc1Q)
 
 ---
 
@@ -85,11 +65,11 @@ O dispositivo exibe sequências de imagens JPEG (campanhas de phishing visuais) 
 | Funcionalidade | Descrição |
 |---|---|
 | **Slideshow automático** | Exibe imagens JPEG em sequência com delay configurável (1–30 s) |
-| **Pausa de slideshow** | Toggle remoto para fixar uma imagem na tela sem atualização |
+| **Pausa de slideshow** | Toggle remoto para fixar uma imagem na tela |
 | **Exibição forçada** | Exibe imediatamente uma imagem específica pelo painel web |
-| **Servidor FTP** | Recebe imagens via FTP na porta 21 (sem upload HTTP problemático) |
+| **Servidor FTP** | Recebe imagens e arquivos via FTP na porta 21 |
 | **Reload automático** | Recarrega a lista de imagens após transferência FTP |
-| **Painel web** | Interface HTML/JS completa para controle remoto do dispositivo |
+| **Painel web (4 abas)** | Slideshow, Evil Portal, Credenciais e Configurações |
 | **Autenticação** | Login por senha com token em todas as requisições de API |
 | **Galeria web** | Visualização de thumbnails das imagens armazenadas no SD |
 | **Reordenação** | Reordena imagens para definir a sequência do slideshow |
@@ -99,6 +79,11 @@ O dispositivo exibe sequências de imagens JPEG (campanhas de phishing visuais) 
 | **Controle de brilho** | PWM no backlight do display (1–255) via painel |
 | **Mutex FreeRTOS** | Acesso seguro ao SD entre FTP, display e servidor web |
 | **Ordem persistente** | Ordem das imagens salva em `/slides/order.txt` |
+| **Evil Portal** | Página de phishing servida a dispositivos conectados ao AP, com suporte a template via SD |
+| **DNS Spoof** | Servidor DNS na porta 53 redirecionando qualquer domínio — aciona captive portal em Android, iOS e Windows |
+| **Captura de credenciais** | Grava qualquer campo de formulário em `/creds.csv` com timestamp e IP do cliente |
+| **Portal customizável** | Substitui a página padrão por `/portal.html` enviado via FTP — qualquer template HTML é aceito |
+| **Furtividade total** | Evil portal opera em paralelo ao slideshow — o display não revela a operação |
 
 ---
 
@@ -111,18 +96,15 @@ O OSEP-32 é construído sobre a **ESP32-2432S028R** ("Cheap Yellow Display" / C
 | Componente | Especificação | Qtd. |
 |---|---|:---:|
 | **ESP32-2432S028R (CYD)** | ESP32 + Display ILI9341 2.8" 320×240 + SD card + touch — all-in-one | 1 |
-| **Cartão microSD** | 8 GB (ou superior), formatado em FAT32 | 1 |
+| **Cartão microSD** | 1 GB (ou superior), formatado em FAT32 | 1 |
 | **Cabo USB-C** | Para gravação do firmware e alimentação | 1 |
 | **Case de acrílico** | Proteção e acabamento (opcional) | 1 |
-
 
 > ✅ **Vantagem:** por ser uma placa all-in-one, basta inserir o cartão microSD, conectar o USB-C e gravar o firmware. Sem jumpers, sem protoboard, sem soldas.
 
 ---
 
 ## 📌 Pinagem Interna (ESP32-2432S028R)
-
-> Todos os periféricos são internos ao PCB. A tabela abaixo é para referência de configuração do firmware e da biblioteca TFT_eSPI.
 
 ### Display TFT ILI9341
 
@@ -145,30 +127,19 @@ O OSEP-32 é construído sobre a **ESP32-2432S028R** ("Cheap Yellow Display" / C
 | GPIO 23 | SPI MOSI do SD | SD_MOSI |
 | GPIO 5  | Chip Select do SD | SD_CS |
 
-> ⚠️ **Importante:** na ESP32-2432S028R o display e o SD utilizam **barramentos SPI independentes** — diferente de montagens manuais onde os dois compartilham o mesmo barramento.
+> ⚠️ **Importante:** na ESP32-2432S028R o display e o SD utilizam **barramentos SPI independentes**.
 
 ---
 
 ## 🚀 Instalação do Firmware
 
-### Pré-requisitos
-
-- [Arduino IDE 1.8.x](https://www.arduino.cc/en/software)
-- ESP32 Board Support: `Arquivo > Preferências > URLs adicionais`:
-  ```
-  https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-  ```
-  Depois: `Ferramentas > Placa > Gerenciador de Placas` → instalar **esp32 by Espressif** (versão 3.3.8+)
-
-### Passos
-
 1. Formate o cartão microSD em **FAT32** e insira na placa
-2. (Opcional) Monte a placa no case de acrílico
-3. Conecte a placa ao computador via cabo USB-C
-4. Instale as bibliotecas listadas na seção [Bibliotecas](#-bibliotecas-necessárias)
-5. Configure o `User_Setup.h` da TFT_eSPI conforme a [seção de configuração](#-configuração-da-tft_espi)
-6. Abra o arquivo `syh2_offensive_social_engineering_device.ino` no Arduino IDE
-7. Selecione: `Ferramentas > Placa > ESP32 Dev Module`
+2. Conecte a placa ao computador via cabo USB-C
+3. Instale as bibliotecas listadas na seção [Bibliotecas](#-bibliotecas-necessárias)
+4. Configure o `User_Setup.h` da TFT_eSPI conforme a [seção de configuração](#-configuração-da-tft_espi)
+5. Abra `syh2_offensive_social_engineering_device.ino` no Arduino IDE
+6. Selecione: `Ferramentas > Placa > ESP32 Dev Module`
+7. Selecione a porta COM correta em `Ferramentas > Porta`
 8. Clique em **Upload**
 9. Na primeira inicialização, o firmware cria automaticamente `/config.txt` e `/slides` no SD
 10. Conecte ao AP Wi-Fi `OSEP-32(SYH2)` (senha: `solydsyh2`)
@@ -181,81 +152,85 @@ O OSEP-32 é construído sobre a **ESP32-2432S028R** ("Cheap Yellow Display" / C
 Edite o arquivo `User_Setup.h` na pasta da biblioteca TFT_eSPI:
 
 ```cpp
-#define ILI9341_DRIVER
-
-// Display SPI (barramento dedicado — ESP32-2432S028R)
+#define ILI9341_2_DRIVER
+#define TFT_RGB_ORDER TFT_BGR
+#define TFT_INVERSION_ON
+#define TFT_WIDTH  240
+#define TFT_HEIGHT 320
+#define TFT_BL   21
+#define TFT_BACKLIGHT_ON HIGH
 #define TFT_MISO 12
 #define TFT_MOSI 13
 #define TFT_SCLK 14
-#define TFT_CS   15   // Chip select do display
-#define TFT_DC    2   // Data/Command
-#define TFT_RST  -1   // Reset ligado ao reset geral da placa
-#define TFT_BL   21   // Backlight PWM
-
-// SD Card usa barramento SPI separado (GPIOs 18/19/23/5)
-// Configurado diretamente no firmware — não alterar aqui
-
+#define TFT_CS   15
+#define TFT_DC    2
+#define TFT_RST  -1
+#define TOUCH_CS 33
 #define SPI_FREQUENCY      27000000
 #define SPI_READ_FREQUENCY 20000000
+#define SPI_TOUCH_FREQUENCY 2500000
 ```
 
 ---
 
 ## 📦 Bibliotecas Necessárias
 
-Instale via **Arduino Library Manager** (`Sketch > Incluir Biblioteca > Gerenciar Bibliotecas`):
-
 | Biblioteca | Versão | Observação |
 |---|---|---|
 | ESP32 Arduino Core | 3.3.8+ | Via Board Manager |
-| AsyncTCP | 1.1.4+ | — |
-| ESPAsyncWebServer | 3.x+ | — |
+| AsyncTCP | 1.1.4+ | Library Manager |
+| ESPAsyncWebServer | 3.x+ | Library Manager |
 | TFT_eSPI | 2.5.x+ | Requer configuração do `User_Setup.h` |
-| TJpg_Decoder | 1.x+ | — |
-| ESP32FtpServer | — | By **robo8080** |
+| TJpg_Decoder | 1.x+ | Library Manager |
+| ESP32FtpServer | — | By **robo8080** — Library Manager |
+| DNSServer | — | **Inclusa no ESP32 Arduino Core** — não requer instalação separada |
 
 ---
 
 ## 🏗️ Arquitetura do Firmware
 
 ```
-syh2_offensive_social_engineering_device.ino
+syh2_offensive_social_engineering_device_v2.ino
 │
 ├── Configuração        saveConfig() / loadConfig()
-│                       Leitura e escrita de parâmetros no SD (/config.txt)
 │
 ├── Imagens             loadImagesFromSD() / saveOrder()
 │                       moveImage() / deleteImageByName()
-│                       Lista ordenada de slides com mutex FreeRTOS
 │
 ├── Display             drawImageByName() / drawStatusOverlay()
-│                       Renderização JPEG via TJpg_Decoder + mutex SD
 │
-├── Rede                startWifi()
-│                       Modo dual AP+STA com fallback automático
+├── Rede                startWifi() — Modo dual AP+STA
 │
-├── FTP                 startFtp()
-│                       Servidor FTP porta 21 (ESP32FtpServer by robo8080)
+├── DNS                 startDns() — Spoof wildcard porta 53
 │
-├── Web                 startWeb()
-│                       Servidor HTTP assíncrono — 11 rotas REST
+├── FTP                 startFtp() — Porta 21
 │
-└── Loop principal      Slideshow + pausa + exibição forçada + reload FTP
+├── Evil Portal         defaultPortalPage() / captureSuccessPage()
+│                       saveCredential() / buildCredsJson()
+│
+├── Web                 startWeb() — 16 rotas REST
+│
+└── Loop principal      Slideshow + evil portal em paralelo
 ```
+
+<img width="1800" height="2080" alt="OSEP32_arquitetura_firmware" src="https://github.com/user-attachments/assets/b8914b0c-2a5a-4cf6-88f0-8f73329d2a08" />
 
 ### Decisões Técnicas
 
+**Furtividade do evil portal**
+O evil portal opera sem interromper o slideshow. O flag `evilPortalActive` controla apenas o roteamento HTTP — o loop principal continua renderizando imagens normalmente, sem indicação visual no display.
+
+**DNS Spoof wildcard**
+O `DNSServer` responde qualquer consulta DNS com o IP do AP (`192.168.4.1`). Combinado com os endpoints de detecção de captive portal (`/generate_204`, `/hotspot-detect.html`, `/ncsi.txt` etc.), o pop-up automático de captive portal é acionado em Android, iOS e Windows sem interação do usuário.
+
+**Captura agnóstica de campos**
+O endpoint `/capture` itera sobre todos os parâmetros POST recebidos e os grava no CSV. Não há dependência de nomes específicos de campos — qualquer formulário HTML com `action="/capture" method="POST"` funciona automaticamente.
+
 **Mutex FreeRTOS para o SD**
-O SD é acessado por três contextos simultâneos (loop, HTTP assíncrono e FTP). O `sdMutex` garante acesso exclusivo em todos os pontos de leitura e escrita, evitando corrupção de dados.
+O `sdMutex` garante acesso exclusivo ao SD em todos os pontos de leitura e escrita entre o loop principal, o servidor HTTP assíncrono e o servidor FTP.
 
 **Arrays globais para evitar Stack Overflow**
 `images[]` e `found[]` (200 elementos `String` cada) são globais. A declaração local consumia ~5 KB de stack por chamada, causando boot loop.
-
-**Mutex separado em saveConfig / saveOrder**
-Essas funções não gerenciam o mutex internamente — o chamador é responsável. Evita deadlocks quando chamadas dentro de `loadImagesFromSD()` que já detém o mutex.
-
-**Flag `ftpDirty` para reload assíncrono**
-A `ESP32FtpServer` não oferece callback de transferência. O botão "Atualizar galeria" define a flag `ftpDirty`, e o loop principal executa o reload de forma segura fora de contextos de interrupção.
 
 ---
 
@@ -265,8 +240,8 @@ Todas as rotas protegidas exigem o parâmetro `token` com a senha do painel.
 
 | Método | Endpoint | Descrição | Auth |
 |:---:|---|---|:---:|
-| `GET` | `/` | Página de login | ❌ |
-| `GET` | `/panel` | Painel de controle | ✅ |
+| `GET` | `/` | Página de login / portal de phishing (quando evil portal ativo) | ❌ |
+| `GET` | `/panel` | Painel de controle (4 abas) | ✅ |
 | `GET` | `/api/list` | Lista JSON de imagens | ✅ |
 | `GET` | `/img?name=X` | Serve imagem JPEG do SD | ✅ |
 | `POST` | `/api/show` | Exibe imagem imediatamente | ✅ |
@@ -276,6 +251,11 @@ Todas as rotas protegidas exigem o parâmetro `token` com a senha do painel.
 | `POST` | `/api/reload` | Força recarregamento da lista | ✅ |
 | `POST` | `/api/config` | Salva configurações | ✅ |
 | `POST` | `/api/reboot` | Reinicia o dispositivo | ✅ |
+| `POST` | `/api/portal` | Toggle ativação/desativação do evil portal | ✅ |
+| `GET` | `/api/creds` | Lista JSON de credenciais capturadas | ✅ |
+| `GET` | `/api/creds/download` | Download do arquivo creds.csv | ✅ |
+| `POST` | `/api/creds/clear` | Apaga o arquivo creds.csv do SD | ✅ |
+| `POST` | `/capture` | Recebe campos do formulário de phishing e salva no SD | ❌ |
 
 ---
 
@@ -293,27 +273,65 @@ Todas as rotas protegidas exigem o parâmetro `token` com a senha do painel.
 
 1. Abra o **FileZilla** ou **WinSCP**
 2. Conecte: Host `192.168.4.1`, Porta `21`, Usuário `osep`, Senha `osep1234`
-3. Navegue até `/slides`
-4. Arraste as imagens JPEG para a pasta
-5. No painel web, clique em **Atualizar galeria**
+3. Navegue até `/slides` e arraste as imagens JPEG
+4. No painel web, clique em **Atualizar galeria**
 
-> 💡 **Dica:** use o script `osep_sender.py` para converter e enviar automaticamente qualquer imagem para o formato correto.
+> 💡 Use o script `osep_sender.py` para converter e enviar automaticamente qualquer imagem para o formato correto.
 
 ### Controle do Slideshow
 
 | Ação | Efeito |
 |---|---|
-| **Mostrar agora** | Exibe a imagem imediatamente e para no índice correspondente |
-| **⏸ Pausar slideshow** | Fixa a imagem atual na tela sem atualização |
-| **▶ Retomar slideshow** | Volta ao ciclo automático a partir da imagem atual |
-| **↑ / ↓** | Reordena a imagem na sequência do slideshow |
-| **Excluir** | Remove permanentemente a imagem do SD card |
+| **Mostrar agora** | Exibe a imagem imediatamente |
+| **⏸ Pausar slideshow** | Fixa a imagem atual na tela |
+| **▶ Retomar slideshow** | Volta ao ciclo automático |
+| **↑ / ↓** | Reordena a imagem na sequência |
+| **Excluir** | Remove permanentemente a imagem do SD |
+
+---
+
+## 🎣 Evil Portal
+
+### Ativação
+
+1. No painel web, acesse a aba **Evil Portal**
+2. Clique em **Ativar Evil Portal** — o status muda para `ATIVO`
+3. O slideshow **continua normalmente** no display (furtividade total)
+4. Qualquer dispositivo conectado ao AP é redirecionado automaticamente para a página de phishing
+
+### Portal Customizado
+
+Envie um arquivo `portal.html` via FTP para a **raiz do SD** (não para `/slides`). Único requisito do formulário:
+
+```html
+<form action="/capture" method="POST">
+  <!-- qualquer campo — todos são capturados automaticamente -->
+  <input type="email" name="email">
+  <input type="password" name="senha">
+  <button type="submit">Entrar</button>
+</form>
+```
+
+### Visualização das Credenciais
+
+Na aba **Credenciais** do painel web:
+- Tabela com todas as capturas (timestamp, IP, campos)
+- Botão **Download CSV** — exporta `/creds.csv`
+- Botão **Limpar** — apaga todas as entradas remotamente
+
+### Compatibilidade de Captive Portal
+
+O DNS spoof wildcard + endpoints de detecção disparam o pop-up automático em:
+
+| Sistema | Endpoint detectado |
+|---|---|
+| Android | `/generate_204`, `/gen_204` |
+| iOS / macOS | `/hotspot-detect.html`, `/library/test/success.html` |
+| Windows | `/ncsi.txt`, `/connecttest.txt` |
 
 ---
 
 ## 🐍 Script osep_sender.py
-
-Script Python que monitora uma pasta local, converte qualquer imagem para o formato correto e envia automaticamente via FTP.
 
 ### Instalação
 
@@ -324,31 +342,25 @@ pip install pillow watchdog
 ### Uso
 
 ```bash
-# Monitoramento contínuo (pasta padrão: ./para_enviar)
+# Monitoramento contínuo
 python osep_sender.py
 
-# Com argumentos personalizados
+# Com argumentos
 python osep_sender.py --host 192.168.1.50 --watch ./imagens --done ./enviados
 
-# Processar arquivos existentes e sair (sem monitorar)
+# Processar e sair
 python osep_sender.py --no-watch
 ```
 
 ### Funcionalidades
 
-- 📁 Monitoramento contínuo de pasta via `watchdog`
-- 🔄 Conversão automática para JPEG 320×240 baseline, qualidade 90
-- 📱 Detecção e correção de rotação EXIF (fotos de celular)
-- 🔃 Rotação automática de imagens em retrato para paisagem
-- ⬛ Letterbox preto para proporções diferentes de 4:3
-- 📤 Envio automático via FTP após conversão
-- 🖼️ Suporte a: PNG, BMP, GIF, WebP, TIFF, JPEG
-
-### Formatos aceitos como entrada
-
-```
-.jpg  .jpeg  .png  .bmp  .gif  .webp  .tiff  .tif
-```
+- Monitoramento contínuo de pasta via `watchdog`
+- Conversão automática para JPEG 320×240 baseline, qualidade 90
+- Detecção e correção de rotação EXIF
+- Rotação automática de retrato para paisagem
+- Letterbox preto para proporções diferentes de 4:3
+- Envio automático via FTP após conversão
+- Suporte a: PNG, BMP, GIF, WebP, TIFF, JPEG
 
 ---
 
@@ -360,7 +372,7 @@ python osep_sender.py --no-watch
 | Painel Web | *(token)* | `solyd` |
 | FTP | `osep` | `osep1234` |
 
-> 🔴 **SEGURANÇA:** altere todas as credenciais padrão antes de utilizar o dispositivo em campo. As configurações podem ser atualizadas pelo painel web e são salvas permanentemente no SD card.
+> 🔴 **SEGURANÇA:** altere todas as credenciais padrão antes de utilizar em campo.
 
 ---
 
@@ -368,10 +380,10 @@ python osep_sender.py --no-watch
 
 ```
 osep-32/
-├── syh2_offensive_social_engineering_device.ino   # Firmware principal
-├── User_Setup.h                                    # Configuração TFT_eSPI para CYD
-├── osep_sender.py                                  # Script de conversão e envio FTP
-└── README.md                                       # Este arquivo
+├── syh2_offensive_social_engineering_device_v2.ino  # Firmware v2 (slideshow + evil portal)
+├── User_Setup.h                                      # Configuração TFT_eSPI para CYD
+├── osep_sender.py                                    # Script de conversão e envio FTP
+└── README.md                                         # Este arquivo
 ```
 
 ---
